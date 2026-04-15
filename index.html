@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fight Elite App</title>
+
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<style>
+body {
+margin:0;
+font-family:-apple-system;
+background:linear-gradient(#0a0a0a,#111);
+color:white;
+}
+
+header {
+padding:20px;
+font-size:20px;
+text-align:center;
+font-weight:600;
+}
+
+.container {
+padding:15px;
+padding-bottom:90px;
+}
+
+.card {
+background:#1c1c1e;
+padding:18px;
+border-radius:20px;
+margin-bottom:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.5);
+}
+
+button {
+width:100%;
+padding:16px;
+margin-top:10px;
+border:none;
+border-radius:15px;
+background:linear-gradient(135deg,#ff3c3c,#ff0000);
+color:white;
+font-size:16px;
+}
+
+input, select {
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:12px;
+border:none;
+background:#2c2c2e;
+color:white;
+}
+
+.nav {
+position:fixed;
+bottom:0;
+width:100%;
+height:75px;
+display:flex;
+background:#111;
+}
+
+.nav button {
+flex:1;
+background:none;
+color:#aaa;
+}
+
+.hidden {display:none;}
+
+h2 {margin-bottom:5px;}
+
+#timer {
+font-size:45px;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>🥊 Fight Elite</header>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="home">
+<div class="card">
+<h2>🧠 Coach</h2>
+<p id="coach"></p>
+<button onclick="updateCoach()">Aggiorna</button>
+</div>
+</div>
+
+<!-- WORKOUT -->
+<div id="workout" class="hidden">
+<div class="card">
+<h2>Allenamento</h2>
+<button onclick="showWorkout('A')">PUSH</button>
+<button onclick="showWorkout('B')">PULL</button>
+<button onclick="showWorkout('C')">GAMBE</button>
+</div>
+
+<div id="workoutContent"></div>
+</div>
+
+<!-- CONDITIONING -->
+<div id="conditioning" class="hidden">
+<div class="card">
+<h2>Condizionamento</h2>
+<p>🥊 Corda: 5-7 round x 2 min</p>
+<p>🏃 Corsa: 20-30 min</p>
+<p>⚡ Sprint: 6x100m</p>
+
+<h3>Stretching</h3>
+<p>Quadricipiti 30s</p>
+<p>Femorali 30s</p>
+<p>Spalle 30s</p>
+</div>
+</div>
+
+<!-- DIETA -->
+<div id="diet" class="hidden">
+<div class="card">
+<h2>Dieta</h2>
+<input id="peso" placeholder="Peso">
+<select id="goal">
+<option value="massa">Massa</option>
+<option value="definizione">Definizione</option>
+</select>
+<button onclick="dieta()">Calcola</button>
+<p id="dietResult"></p>
+</div>
+</div>
+
+</div>
+
+<div class="nav">
+<button onclick="showPage('home')">🏠</button>
+<button onclick="showPage('workout')">🏋️</button>
+<button onclick="showPage('conditioning')">🥊</button>
+<button onclick="showPage('diet')">🍽</button>
+</div>
+
+<script>
+
+function showPage(p){
+document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(p).classList.remove('hidden');
+}
+
+// IA COACH MIGLIORATA
+function updateCoach(){
+let peso = localStorage.getItem("peso");
+
+let msg = "Inserisci dati per iniziare";
+
+if(peso){
+if(peso < 70) msg = "Aumenta massa e forza. Focus su pesi.";
+else if(peso > 85) msg = "Dimagrisci leggermente e aumenta cardio.";
+else msg = "Perfetto: lavora su esplosività e tecnica.";
+}
+
+document.getElementById("coach").innerText = msg;
+}
+
+// WORKOUT PRO
+function showWorkout(day){
+let workouts = {
+A:"Panca 5x5<br>Military 4x6<br>Push Press<br>Dips<br>Push-up esplosivi",
+B:"Stacco 5x5<br>Rematore<br>Trazioni<br>Farmer walk",
+C:"Squat 5x5<br>Affondi<br>Jump squat<br>Calf raise"
+};
+
+document.getElementById("workoutContent").innerHTML =
+"<div class='card'>"+workouts[day]+"</div>";
+}
+
+// DIETA
+function dieta(){
+let peso = document.getElementById("peso").value;
+let goal = document.getElementById("goal").value;
+
+localStorage.setItem("peso", peso);
+
+let cal = peso30;
+if(goal=="massa") cal+=300;
+if(goal=="definizione") cal-=300;
+
+document.getElementById("dietResult").innerText =
+"Calorie: "+cal+" kcal\nProteine: "+(peso2)+"g\nCarbo: "+(peso*4)+"g";
+
+updateCoach();
+}
+
+</script>
+
+</body>
+</html>
