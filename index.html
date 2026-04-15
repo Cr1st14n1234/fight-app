@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fight Elite Ultimate</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+body{margin:0;background:#0a0a0a;color:white;font-family:'Oswald',sans-serif;}
+header{text-align:center;padding:20px;font-size:24px;}
+.container{padding:15px;padding-bottom:100px;}
+.card{background:#1c1c1e;padding:15px;border-radius:15px;margin-bottom:12px;}
+h2{color:#ff3b30;}
+button{width:100%;padding:12px;margin-top:5px;background:#ff3b30;border:none;color:white;border-radius:10px;}
+input,select{width:100%;padding:10px;margin-top:5px;border-radius:10px;border:none;background:#2c2c2e;color:white;}
+.nav{position:fixed;bottom:0;width:100%;display:flex;background:#111;}
+.nav button{flex:1;background:none;color:#888;}
+.nav button.active{color:#ff3b30;}
+.hidden{display:none;}
+img{width:100%;border-radius:10px;margin-top:5px;}
+.series button{width:22%;background:#333;}
+.series button.active{background:#00ff88;color:black;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:black;display:none;overflow:auto;padding:20px;}
+</style>
+</head>
+
+<body>
+
+<header>🥊 FIGHT ELITE ULTIMATE</header>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="home">
+<div class="card">
+<h2>Progressi</h2>
+<p id="xp"></p>
+<p id="streak"></p>
+</div>
+</div>
+
+<!-- WORKOUT -->
+<div id="workout" class="hidden">
+<div class="card">
+<button onclick="loadWorkout('A')">Martedì PUSH</button>
+<button onclick="loadWorkout('B')">Giovedì PULL</button>
+<button onclick="loadWorkout('C')">Sabato GAMBE</button>
+</div>
+<div id="workoutContent"></div>
+</div>
+
+<!-- PESO -->
+<div id="weight" class="hidden">
+<div class="card">
+<input id="pesoInput" placeholder="Peso">
+<button onclick="saveWeight()">Salva</button>
+<canvas id="chart"></canvas>
+</div>
+</div>
+
+<!-- TIMER -->
+<div id="timer" class="hidden">
+<div class="card">
+<button onclick="startFight()">Start 3 Round</button>
+<p id="timerText"></p>
+</div>
+</div>
+
+<!-- DIETA -->
+<div id="diet" class="hidden">
+<div class="card">
+<input id="peso" placeholder="Peso">
+<input id="altezza" placeholder="Altezza">
+<select id="goal">
+<option value="massa">Massa</option>
+<option value="definizione">Definizione</option>
+</select>
+<button onclick="dieta()">Calcola</button>
+<p id="dietResult"></p>
+</div>
+</div>
+
+<!-- AI -->
+<div id="ai" class="hidden">
+<div class="card">
+<div id="chat"></div>
+<input id="input">
+<button onclick="send()">Invia</button>
+</div>
+</div>
+
+</div>
+
+<div id="modal" class="modal" onclick="this.style.display='none'"></div>
+
+<div class="nav">
+<button onclick="nav('home',this)" class="active">Home</button>
+<button onclick="nav('workout',this)">Workout</button>
+<button onclick="nav('weight',this)">Peso</button>
+<button onclick="nav('timer',this)">Fight</button>
+<button onclick="nav('diet',this)">Dieta</button>
+<button onclick="nav('ai',this)">AI</button>
+</div>
+
+<script>
+
+// NAV
+function nav(p,b){
+document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(p).classList.remove('hidden');
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+}
+
+// DATI
+let xp=parseInt(localStorage.getItem("xp")||0);
+let streak=parseInt(localStorage.getItem("streak")||0);
+
+document.getElementById("xp").innerText="XP: "+xp;
+document.getElementById("streak").innerText="Streak: "+streak;
+
+// WORKOUT
+function loadWorkout(t){
+
+let stretchStart=`
+<h2>Stretching dinamico</h2>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Jumping_jacks.gif">
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Squat.gif">`;
+
+let stretchEnd=`
+<h2>Stretching finale</h2>
+<img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Toe_touch_stretch.gif">`;
+
+let ex={
+A:["Panca","Military","Dips","Push-up"],
+B:["Stacco","Rematore","Trazioni","Curl"],
+C:["Squat","Affondi","Jump squat","Calf"]
+};
+
+let html=`
+<div class="card">
+<h3>Stretching iniziale</h3>
+<button onclick="openModal(\`${stretchStart}\`)">Apri</button>
+</div>
+`;
+
+ex[t].forEach(e=>{
+html+=`
+<div class="card">
+<h3>${e}</h3>
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Bench_press.gif" onclick="openModal('<img src=this.src>')">
+<div class="series">
+<button onclick="done(this)">1</button>
+<button onclick="done(this)">2</button>
+<button onclick="done(this)">3</button>
+<button onclick="done(this)">4</button>
+</div>
+</div>`;
+});
+
+html+=`
+<div class="card">
+<h3>Stretching finale</h3>
+<button onclick="openModal(\`${stretchEnd}\`)">Apri</button>
+</div>
+`;
+
+document.getElementById("workoutContent").innerHTML=html;
+}
+
+// SERIE
+function done(btn){
+btn.classList.toggle("active");
+xp+=5;
+localStorage.setItem("xp",xp);
+}
+
+// MODALE
+function openModal(c){
+let m=document.getElementById("modal");
+m.innerHTML=c;
+m.style.display="block";
+}
+
+// PESO
+let weights=JSON.parse(localStorage.getItem("weights")||"[]");
+
+function saveWeight(){
+let w=document.getElementById("pesoInput").value;
+weights.push(w);
+localStorage.setItem("weights",JSON.stringify(weights));
+drawChart();
+}
+
+function drawChart(){
+new Chart(document.getElementById("chart"),{
+type:'line',
+data:{labels:weights,datasets:[{data:weights}]}
+});
+}
+drawChart();
+
+// TIMER
+function startFight(){
+let t=180;
+let i=setInterval(()=>{
+t--;
+document.getElementById("timerText").innerText=t;
+if(t<=0)clearInterval(i);
+},1000);
+}
+
+// DIETA
+function dieta(){
+let p=document.getElementById("peso").value;
+let a=document.getElementById("altezza").value;
+let g=document.getElementById("goal").value;
+
+let cal=(10*p+6.25*a-100)*1.5;
+
+let txt=`Calorie: ${Math.round(cal)}
+
+Proteine: ${p*2}g
+Carbo: ${p*4}g
+
+Colazione: uova + avena
+Pranzo: riso + pollo
+Cena: carne + verdure
+
+Consiglio: disciplina totale`;
+
+document.getElementById("dietResult").innerText=txt;
+}
+
+// IA
+let profile={};
+
+function send(){
+let msg=document.getElementById("input").value;
+let chat=document.getElementById("chat");
+
+let r="Allenati meglio.";
+
+if(msg.includes("massa")) r="Aumenta calorie e carichi.";
+if(msg.includes("dimagr")) r="Deficit calorico e cardio.";
+if(msg.includes("stanco")) r="Recupera.";
+
+chat.innerHTML+=`<p>${msg}</p><p>${r}</p>`;
+}
+
+</script>
+
+</body>
+</html>
