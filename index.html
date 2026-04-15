@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fight Elite Ultimate PRO</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{margin:0;background:#0b0b0d;color:white;font-family:sans-serif;}
+header{text-align:center;padding:20px;font-size:26px;font-weight:bold;}
+.container{padding:15px;padding-bottom:100px;}
+
+.card{
+background:#1c1c1e;
+padding:15px;
+border-radius:15px;
+margin-bottom:12px;
+box-shadow:0 0 12px rgba(255,0,0,0.2);
+}
+
+h2{color:#ff3b30;}
+
+button{
+width:100%;
+padding:12px;
+margin-top:6px;
+border:none;
+border-radius:10px;
+background:#ff3b30;
+color:white;
+font-weight:bold;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-top:5px;
+border-radius:10px;
+border:none;
+background:#2c2c2e;
+color:white;
+}
+
+.nav{
+position:fixed;
+bottom:0;
+width:100%;
+display:flex;
+background:#111;
+}
+
+.nav button{flex:1;background:none;color:#888;}
+.nav button.active{color:#ff3b30;}
+
+.hidden{display:none;}
+
+.exercise img{
+width:100%;
+border-radius:10px;
+margin-top:8px;
+cursor:pointer;
+}
+
+.series button{
+width:23%;
+background:#333;
+margin:2px;
+}
+
+.series button.active{
+background:#00ff88;
+color:black;
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.modal img{
+max-width:90%;
+border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🥊 FIGHT ELITE PRO</header>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="home">
+<div class="card">
+<h2>🎮 LIVELLO</h2>
+<p id="level"></p>
+<p id="xp"></p>
+<p id="streak"></p>
+<p id="progress"></p>
+</div>
+
+<div class="card">
+<h2>🧠 COACH</h2>
+<p id="coach"></p>
+</div>
+</div>
+
+<!-- WORKOUT -->
+<div id="workout" class="hidden">
+<div class="card">
+<button onclick="loadWorkout('A')">PUSH</button>
+<button onclick="loadWorkout('B')">PULL</button>
+<button onclick="loadWorkout('C')">GAMBE</button>
+</div>
+<div id="workoutContent"></div>
+</div>
+
+<!-- DIETA -->
+<div id="diet" class="hidden">
+<div class="card">
+<input id="peso" placeholder="Peso">
+<input id="altezza" placeholder="Altezza">
+<select id="goal">
+<option value="massa">Massa</option>
+<option value="definizione">Definizione</option>
+</select>
+<button onclick="dieta()">Calcola</button>
+<p id="dietResult"></p>
+</div>
+</div>
+
+<!-- AI -->
+<div id="ai" class="hidden">
+<div class="card">
+<div id="chat"></div>
+<input id="input">
+<button onclick="send()">Invia</button>
+</div>
+</div>
+
+</div>
+
+<div class="modal" id="modal" onclick="closeModal()">
+<img id="modalImg">
+</div>
+
+<div class="nav">
+<button onclick="nav('home',this)" class="active">Home</button>
+<button onclick="nav('workout',this)">Workout</button>
+<button onclick="nav('diet',this)">Dieta</button>
+<button onclick="nav('ai',this)">AI</button>
+</div>
+
+<script>
+
+// NAV
+function nav(p,b){
+document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(p).classList.remove('hidden');
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+}
+
+// MODAL FIX
+function openModal(src){
+modal.style.display="flex";
+modalImg.src=src;
+}
+function closeModal(){modal.style.display="none";}
+
+// DATI
+let xp=parseInt(localStorage.getItem("xp")||0);
+let streak=parseInt(localStorage.getItem("streak")||0);
+let progress=parseInt(localStorage.getItem("progress")||0);
+
+// HOME
+function updateHome(){
+level.innerText="Livello "+Math.floor(xp/100+1);
+xpText= "XP "+xp;
+xpEl = document.getElementById("xp"); xpEl.innerText=xpText;
+streakEl=document.getElementById("streak"); streakEl.innerText="Streak "+streak;
+progressEl=document.getElementById("progress"); progressEl.innerText="Progress "+progress+"%";
+
+let coach="Spingi forte.";
+if(streak>3) coach="Mentalità da fighter.";
+if(progress>70) coach="Quasi completato.";
+
+document.getElementById("coach").innerText=coach;
+}
+updateHome();
+
+// WORKOUT COMPLETO
+function loadWorkout(type){
+
+let data={
+A:[
+["Panca","https://upload.wikimedia.org/wikipedia/commons/0/0c/Bench_press.gif"],
+["Military","https://upload.wikimedia.org/wikipedia/commons/3/3a/Shoulder_press.gif"],
+["Dips","https://upload.wikimedia.org/wikipedia/commons/8/8c/Dips.gif"],
+["Push-up","https://upload.wikimedia.org/wikipedia/commons/5/5f/Push-up.gif"]
+],
+B:[
+["Rematore","https://upload.wikimedia.org/wikipedia/commons/2/2c/Barbell_row.gif"],
+["Curl","https://upload.wikimedia.org/wikipedia/commons/8/8f/Biceps_curl.gif"],
+["Trazioni","https://upload.wikimedia.org/wikipedia/commons/8/8d/Pull_up.gif"]
+],
+C:[
+["Squat","https://upload.wikimedia.org/wikipedia/commons/3/3e/Squat.gif"],
+["Affondi","https://upload.wikimedia.org/wikipedia/commons/4/4e/Lunge.gif"],
+["Jump squat","https://upload.wikimedia.org/wikipedia/commons/5/5c/Jump_squat.gif"]
+]
+};
+
+let html="";
+
+data[type].forEach(e=>{
+html+=`
+<div class="card exercise">
+<h3>${e[0]}</h3>
+<img src="${e[1]}" onclick="openModal('${e[1]}')">
+<div class="series">
+<button onclick="done(this)">1</button>
+<button onclick="done(this)">2</button>
+<button onclick="done(this)">3</button>
+<button onclick="done(this)">4</button>
+</div>
+</div>`;
+});
+
+workoutContent.innerHTML=html;
+}
+
+// SERIE
+function done(btn){
+btn.classList.toggle("active");
+xp+=5;
+progress+=2;
+
+if(progress>=100){
+streak++;
+progress=0;
+}
+
+localStorage.setItem("xp",xp);
+localStorage.setItem("progress",progress);
+localStorage.setItem("streak",streak);
+
+updateHome();
+}
+
+// DIETA
+function dieta(){
+let p=peso.value;
+let a=altezza.value;
+let cal=(10*p+6.25*a-100)*1.5;
+
+dietResult.innerText=
+"Calorie: "+Math.round(cal)+
+"\nProteine: "+p*2+
+"\nCarbo: "+p*4+
+"\nGrassi: "+p+
+"\n\nColazione: uova + avena\nPranzo: riso + pollo\nCena: carne + verdure";
+}
+
+// IA
+function send(){
+let msg=input.value.toLowerCase();
+let r="Allenati forte.";
+
+if(msg.includes("massa")) r="Aumenta calorie e carichi.";
+if(msg.includes("dimagr")) r="Deficit + cardio.";
+if(msg.includes("stanco")) r="Recupera.";
+
+chat.innerHTML+=`<p>${msg}</p><p>${r}</p>`;
+input.value="";
+}
+
+</script>
+
+</body>
+</html>
