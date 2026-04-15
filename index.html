@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fight Elite Pro</title>
+
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<style>
+body {
+margin:0;
+font-family:-apple-system;
+background:#0d0d0f;
+color:white;
+}
+
+header {
+padding:18px;
+font-size:22px;
+font-weight:600;
+text-align:center;
+border-bottom:1px solid #222;
+background:#000;
+}
+
+.container {
+padding:15px;
+padding-bottom:90px;
+}
+
+.card {
+background:#1c1c1e;
+padding:15px;
+border-radius:16px;
+margin-bottom:12px;
+}
+
+h2 {
+margin:5px 0 10px;
+font-size:18px;
+}
+
+.exercise {
+padding:10px 0;
+border-bottom:1px solid #333;
+font-size:15px;
+}
+
+button {
+width:100%;
+padding:14px;
+margin-top:6px;
+border:none;
+border-radius:12px;
+background:#ff3b30;
+color:white;
+font-weight:600;
+}
+
+input, select {
+width:100%;
+padding:12px;
+margin-top:6px;
+border-radius:10px;
+border:none;
+background:#2c2c2e;
+color:white;
+}
+
+.nav {
+position:fixed;
+bottom:0;
+width:100%;
+display:flex;
+background:#111;
+border-top:1px solid #222;
+}
+
+.nav button {
+flex:1;
+background:none;
+color:#888;
+font-size:12px;
+}
+
+.nav button.active {
+color:#ff3b30;
+}
+
+.hidden {display:none;}
+</style>
+</head>
+
+<body>
+
+<header>🥊 Fight Elite Pro</header>
+
+<div class="container">
+
+<div id="home">
+<div class="card">
+<h2>🔥 Oggi</h2>
+<p id="todayWorkout">Workout: PUSH</p>
+<p>Focus: forza + esplosività</p>
+</div>
+
+<div class="card">
+<h2>📊 Stato</h2>
+<p id="pesoDisplay">Peso: -</p>
+<p id="goalDisplay">Obiettivo: -</p>
+</div>
+
+<div class="card">
+<h2>🧠 Coach</h2>
+<p id="coachText">
+Allenati come un fighter: forza, velocità, resistenza.
+</p>
+</div>
+</div>
+
+<div id="workout" class="hidden">
+<div class="card">
+<h2>Allenamenti</h2>
+<button onclick="loadWorkout('A')">PUSH</button>
+<button onclick="loadWorkout('B')">PULL</button>
+<button onclick="loadWorkout('C')">GAMBE</button>
+</div>
+
+<div id="workoutContent"></div>
+</div>
+
+<div id="cond" class="hidden">
+<div class="card">
+<h2>🥊 Conditioning</h2>
+
+<div class="exercise"><b>Corda</b> — 6-8 round x 2 min</div>
+<div class="exercise"><b>Sprint</b> — 8x100m</div>
+<div class="exercise"><b>Corsa</b> — 25 min ritmo medio</div>
+<div class="exercise"><b>HIIT fighter</b> — 30/30 x 10</div>
+
+<h3>Stretching</h3>
+
+<div class="exercise">Quad stretch in piedi — 30s</div>
+<div class="exercise">Hamstring stretch — 30s</div>
+<div class="exercise">Hip flexor stretch — 30s</div>
+<div class="exercise">Shoulder stretch — 30s</div>
+<div class="exercise">Back rotation — 30s</div>
+
+</div>
+</div>
+
+<div id="diet" class="hidden">
+<div class="card">
+<h2>Dieta</h2>
+
+<input id="peso" placeholder="Peso (kg)">
+<input id="altezza" placeholder="Altezza (cm)">
+
+<select id="goal">
+<option value="massa">Massa</option>
+<option value="definizione">Definizione</option>
+</select>
+
+<button onclick="dieta()">Calcola dieta</button>
+
+<p id="dietResult"></p>
+
+</div>
+</div>
+
+</div>
+
+<div class="nav">
+<button onclick="nav('home',this)" class="active">Home</button>
+<button onclick="nav('workout',this)">Workout</button>
+<button onclick="nav('cond',this)">Cond</button>
+<button onclick="nav('diet',this)">Dieta</button>
+</div>
+
+<script>
+
+function nav(page,btn){
+document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(page).classList.remove('hidden');
+
+document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+
+function getTodayWorkout(){
+let days = ["A","B","C"];
+let index = new Date().getDay() % 3;
+return days[index];
+}
+
+function loadWorkout(type){
+
+let workouts = {
+
+A: [
+"Panca piana 5x5",
+"Panca inclinata 4x8",
+"Military press 4x6",
+"Push press 3x5",
+"Alzate laterali 4x12",
+"Alzate frontali 3x10",
+"Dips 4x10",
+"Push-up esplosivi 3x max"
+],
+
+B: [
+"Stacco 5x5",
+"Rematore bilanciere 4x8",
+"Trazioni 4x max",
+"Pullover 3x10",
+"Curl bilanciere 4x10",
+"Curl martello 3x12",
+"Farmer walk 4x30s"
+],
+
+C: [
+"Squat 5x5",
+"Affondi 4x10",
+"Romanian deadlift 4x8",
+"Leg curl 3x12",
+"Calf raise 5x15",
+"Jump squat 4x8",
+"Box jump 4x6"
+]
+
+};
+
+let html = "";
+
+workouts[type].forEach(e=>{
+html += `<div class="card exercise">${e}</div>`;
+});
+
+document.getElementById("workoutContent").innerHTML = html;
+}
+
+function dieta(){
+let peso = document.getElementById("peso").value;
+let altezza = document.getElementById("altezza").value;
+let goal = document.getElementById("goal").value;
+
+localStorage.setItem("peso",peso);
+localStorage.setItem("goal",goal);
+
+let bmr = 10*peso + 6.25*altezza - 5*20 + 5;
+let cal = bmr * 1.5;
+
+if(goal=="massa") cal+=300;
+if(goal=="definizione") cal-=300;
+
+document.getElementById("dietResult").innerText =
+"Calorie: "+Math.round(cal)+" kcal\nProteine: "+(peso*2)+"g\nCarbo: "+(peso*4)+"g\nGrassi: "+(peso*1)+"g";
+
+updateHome();
+}
+
+function updateHome(){
+let peso = localStorage.getItem("peso");
+let goal = localStorage.getItem("goal");
+
+if(peso){
+document.getElementById("pesoDisplay").innerText = "Peso: "+peso+" kg";
+document.getElementById("goalDisplay").innerText = "Obiettivo: "+goal;
+}
+
+document.getElementById("todayWorkout").innerText =
+"Workout: "+getTodayWorkout();
+}
+
+updateHome();
+
+</script>
+
+</body>
+</html>
