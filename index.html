@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fight App Elite</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#0d0d0d;
+    color:white;
+}
+
+header {
+    background:#ff3c3c;
+    padding:20px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.container {
+    padding:15px;
+}
+
+.card {
+    background:#1c1c1c;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+button {
+    width:100%;
+    padding:15px;
+    margin:8px 0;
+    border:none;
+    border-radius:10px;
+    background:#ff3c3c;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+button:active {
+    transform:scale(0.97);
+}
+
+input {
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border-radius:10px;
+    border:none;
+    background:#2a2a2a;
+    color:white;
+}
+
+h2 {
+    margin-bottom:10px;
+}
+
+#timer {
+    font-size:30px;
+    text-align:center;
+    margin-top:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>🥊 Fight App Elite</header>
+
+<div class="container">
+
+<div class="card">
+<h2>Allenamento</h2>
+<button onclick="showDay('A')">🔥 Giorno A - PUSH</button>
+<button onclick="showDay('B')">💪 Giorno B - PULL</button>
+<button onclick="showDay('C')">🦵 Giorno C - GAMBE</button>
+</div>
+
+<div id="workout"></div>
+
+<div class="card">
+<h2>⏱ Timer</h2>
+<button onclick="startTimer(120)">Round 2 min</button>
+<button onclick="startTimer(60)">HIIT 1 min</button>
+<p id="timer">0</p>
+</div>
+
+<div class="card">
+<h2>📊 Tracker</h2>
+<input id="exercise" placeholder="Esercizio">
+<input id="weight" placeholder="Peso">
+<button onclick="saveData()">Salva</button>
+<p id="history"></p>
+</div>
+
+</div>
+
+<script>
+
+function showDay(day){
+    const workouts = {
+        A: "Panca 5x5 • Military 4x6 • Push Press • Push-up esplosivi",
+        B: "Stacco 5x5 • Rematore 4x8 • Farmer walk",
+        C: "Squat 5x5 • Bulgarian squat • Jump squat"
+    };
+
+    document.getElementById("workout").innerHTML =
+    "<div class='card'><h2>"+workouts[day]+"</h2></div>";
+}
+
+let interval;
+
+function startTimer(seconds){
+    clearInterval(interval);
+    let time = seconds;
+    document.getElementById("timer").innerText = time;
+
+    interval = setInterval(()=>{
+        time--;
+        document.getElementById("timer").innerText = time;
+
+        if(time<=0){
+            clearInterval(interval);
+            alert("Round finito!");
+        }
+    },1000);
+}
+
+function saveData(){
+    let ex = document.getElementById("exercise").value;
+    let w = document.getElementById("weight").value;
+
+    let data = JSON.parse(localStorage.getItem("log")) || [];
+    data.push(ex + ": " + w + "kg");
+
+    localStorage.setItem("log", JSON.stringify(data));
+    showHistory();
+}
+
+function showHistory(){
+    let data = JSON.parse(localStorage.getItem("log")) || [];
+    document.getElementById("history").innerHTML = data.join("<br>");
+}
+
+showHistory();
+
+</script>
+
+</body>
+</html>
