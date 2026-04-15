@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fight Elite Ultimate</title>
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+margin:0;
+font-family:-apple-system;
+background:linear-gradient(180deg,#000,#1a1a1a);
+color:white;
+}
+
+header {
+padding:20px;
+text-align:center;
+font-size:20px;
+font-weight:600;
+background:#000;
+}
+
+.container {
+padding:15px;
+padding-bottom:100px;
+}
+
+.card {
+background:#1c1c1e;
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+button {
+width:100%;
+padding:14px;
+margin-top:5px;
+border:none;
+border-radius:10px;
+background:#ff3c3c;
+color:white;
+}
+
+input, select {
+width:100%;
+padding:12px;
+margin-top:5px;
+border-radius:8px;
+border:none;
+background:#2c2c2e;
+color:white;
+}
+
+.exercise img {
+width:100%;
+border-radius:10px;
+}
+
+.series button {
+width:22%;
+background:#333;
+margin:2px;
+}
+
+.series button.active {
+background:#00ff88;
+color:black;
+}
+
+.nav {
+position:fixed;
+bottom:0;
+width:100%;
+display:flex;
+background:#111;
+}
+
+.nav button {
+flex:1;
+background:none;
+color:#aaa;
+}
+
+.nav button.active {
+color:#ff3c3c;
+}
+
+.hidden {display:none;}
+</style>
+</head>
+<body>
+<header>Fight Elite Ultimate</header>
+<div class="container">
+<!-- HOME -->
+<div id="home">
+<div class="card">
+<h2>Dashboard</h2>
+<p id="coach"></p>
+<p id="stats"></p>
+</div>
+</div>
+<!-- WORKOUT -->
+<div id="workout" class="hidden">
+<div class="card">
+<h2>Allenamento</h2>
+<button onclick="loadWorkout('A')">PUSH</button>
+<button onclick="loadWorkout('B')">PULL</button>
+<button onclick="loadWorkout('C')">GAMBE</button>
+</div>
+<div id="workoutContent"></div>
+</div>
+<!-- CONDITIONING -->
+<div id="cond" class="hidden">
+<div class="card">
+<h2>Condizionamento</h2>
+<div class="card">
+<h3>Corda</h3>
+<img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Jump_rope.gif">
+<p>6 round x 2 min</p>
+</div>
+<div class="card">
+<h3>Sprint</h3>
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Sprinting.jpg">
+<p>8x100m</p>
+</div>
+<div class="card">
+<h3>Corsa</h3>
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Running.jpg">
+<p>25 min</p>
+</div>
+<h3>Stretching</h3>
+<p>Quadricipiti 30s</p>
+<p>Femorali 30s</p>
+<p>Spalle 30s</p>
+</div>
+</div>
+<!-- DIETA -->
+<div id="diet" class="hidden">
+<div class="card">
+<h2>Dieta</h2>
+<input id="peso" placeholder="Peso">
+<input id="altezza" placeholder="Altezza">
+<select id="goal">
+<option value="massa">Massa</option>
+<option value="definizione">Definizione</option>
+</select>
+<button onclick="dieta()">Calcola</button>
+<p id="dietResult"></p>
+</div>
+</div>
+</div>
+<div class="nav">
+<button onclick="nav('home',this)" class="active">Home</button>
+<button onclick="nav('workout',this)">Workout</button>
+<button onclick="nav('cond',this)">Cond</button>
+<button onclick="nav('diet',this)">Dieta</button>
+</div>
+<script>
+
+// NAV
+function nav(page,btn){
+document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(page).classList.remove('hidden');
+
+document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+
+// DASHBOARD
+function updateDashboard(){
+let peso = localStorage.getItem("peso");
+
+let coach = "Inserisci dati";
+let stats = "";
+
+if(peso){
+coach = "Allenati completo: forza + velocità";
+stats = "Peso: "+peso+" kg";
+}
+
+document.getElementById("coach").innerText = coach;
+document.getElementById("stats").innerText = stats;
+}
+
+// WORKOUT (AMPLIATO)
+function loadWorkout(type){
+
+let ex = {
+A:[
+["Panca","https://upload.wikimedia.org/wikipedia/commons/0/0c/Bench_press.gif"],
+["Military","https://upload.wikimedia.org/wikipedia/commons/8/8c/Overhead_press.gif"],
+["Push Press","https://upload.wikimedia.org/wikipedia/commons/3/3b/Push_press.gif"],
+["Dips","https://upload.wikimedia.org/wikipedia/commons/8/89/Dips.gif"],
+["Push-up","https://upload.wikimedia.org/wikipedia/commons/4/4c/Push-up.gif"]
+],
+B:[
+["Stacco","https://upload.wikimedia.org/wikipedia/commons/3/3d/Deadlift.gif"],
+["Rematore","https://upload.wikimedia.org/wikipedia/commons/2/2b/Bent-over_row.gif"],
+["Trazioni","https://upload.wikimedia.org/wikipedia/commons/4/4f/Pull-up.gif"],
+["Curl","https://upload.wikimedia.org/wikipedia/commons/7/7e/Biceps_curl.gif"]
+],
+C:[
+["Squat","https://upload.wikimedia.org/wikipedia/commons/3/3e/Squat.gif"],
+["Affondi","https://upload.wikimedia.org/wikipedia/commons/9/94/Lunge.gif"],
+["Jump Squat","https://upload.wikimedia.org/wikipedia/commons/6/6c/Jump_squat.gif"],
+["Calf","https://upload.wikimedia.org/wikipedia/commons/1/1d/Calf_raise.gif"]
+]
+};
+
+let html="";
+
+ex[type].forEach((e)=>{
+html+=`
+<div class="card">
+<h3>${e[0]}</h3>
+<img src="${e[1]}">
+<p>4x8-12</p>
+
+<div class="series">
+<button onclick="done(this)">1</button>
+<button onclick="done(this)">2</button>
+<button onclick="done(this)">3</button>
+<button onclick="done(this)">4</button>
+</div>
+</div>`;
+});
+
+document.getElementById("workoutContent").innerHTML=html;
+}
+
+// SERIE
+function done(btn){
+btn.classList.toggle("active");
+}
+
+// DIETA COMPLETA
+function dieta(){
+let peso = document.getElementById("peso").value;
+let altezza = document.getElementById("altezza").value;
+let goal = document.getElementById("goal").value;
+
+localStorage.setItem("peso",peso);
+
+let bmr = 10*peso + 6.25*altezza - 5*20 + 5;
+let cal = bmr * 1.5;
+
+if(goal=="massa") cal+=300;
+if(goal=="definizione") cal-=300;
+
+document.getElementById("dietResult").innerText =
+"Calorie: "+Math.round(cal)+"\nProteine: "+(peso*2)+"g\nCarbo: "+(peso*4)+"g\nGrassi: "+(peso*1)+"g";
+
+updateDashboard();
+}
+
+updateDashboard();
+
+</script>
+</body>
+</html>
+:::
